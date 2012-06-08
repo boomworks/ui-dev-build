@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<project>
+
+	<property name="NAntContribPath" value="C:\Program Files\nantcontrib-0.91\bin\NAnt.Contrib.Tasks.dll"/>
+	<property name="JavaPath" value="C:\Program Files\Java\jre6\bin\java.exe"/>
+	<property name="ClosureCompilerPath" value="C:\Program Files\closure-compiler\compiler.jar"/>
+	<property name="YUICompressorPath" value="C:\Program Files\yuicompressor-2.4.7\build\yuicompressor-2.4.7.jar"/>
+	<property name="PNGCrushPath" value="C:\Program Files\pngcrush\pngcrush.exe"/>
+	<property name="JPEGTranPath" value="C:\Program Files\jpegtran\jpegtran.exe"/>
+	<property name="SASSPath" value="C:\Ruby187\bin\sass.bat"/>
+
+</project>

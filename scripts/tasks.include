@@ -1,0 +1,175 @@
+<?xml version="1.0"?>
+<!-- 
+TODO:
+- Make lists of JS/CSS/etc. files configurable
+- Wiki page with instructions, point to it on path fails
+-->
+<project>
+
+	<!-- Include machine specific properties -->
+	<property name="LocalSettingsFile" value="${environment::get-folder-path('LocalApplicationData')}\.nant\local-settings.include"/>
+
+	<if test="${not file::exists(LocalSettingsFile)}">
+		<fail message="You need a local settings file in ${LocalSettingsFile}"/>
+	</if>
+
+	<include buildfile="${LocalSettingsFile}"/>
+
+	<if test="${not file::exists(NAntContribPath)}">
+		<fail message="You need to install NAntContrib &amp; update your NAntContribPath property in ${LocalSettingsFile}"/>
+	</if>
+	<loadtasks assembly="${NAntContribPath}" />
+
+	<property name="AppPrefix" value="${string::to-lower(string::replace(project::get-name(), ' ', '-'))}" unless="${property::exists('AppPrefix')}"/>
+
+	<property name="now" value="${datetime::now()}"/>
+	<!--<property name="Timestamp" value="${datetime::get-year(now)}${datetime::get-month(now)}${datetime::get-day(now)}${datetime::get-hour(now)}${datetime::get-minute(now)}${datetime::get-second(now)}"/>-->
+	<tstamp property="Timestamp" pattern="yyyyMMddHHmmss"/>
+
+	<property name="SrcPath" value="src/"/>
+	<property name="ImagesPath" value="${SrcPath}images/"/>
+	<property name="SCSSPath" value="${SrcPath}scss"/>
+	<property name="CSSPath" value="${SrcPath}css"/>
+
+	<property name="DistPath" value="dist/${Timestamp}/"/>
+	<property name="DistImagesPath" value="${DistPath}images/"/>
+	<property name="DistContentImagesPath" value="${DistPath}content_images/"/>
+	<property name="DistZipPath" value="dist/${Timestamp}_${AppPrefix}_delivery.zip"/>
+
+	<target name="cleanup-temp-files">
+		<delete file="${SrcPath}building" />
+		<delete file="${SrcPath}css-files" />
+		<delete file="${SrcPath}js-files" />
+	</target>
+
+	<target name="zip-dist-files">
+		<zip zipfile="${DistZipPath}">
+			<fileset basedir="${DistPath}">
+				<include name="**/*" />
+			</fileset>
+		</zip>	
+	</target>
+
+
+	<target name="concatenate-js">
+
+		<property name="ConcattedFileName" value="${AppPrefix}-${Timestamp}.js"/>
+		<foreach item="String" in="${JSFiles}" delim=" " property="filename">
+			<concat destfile="${DistPath}js/${ConcattedFileName}" append="true">
+				<fileset>
+					<include name="${SrcPath}js/${filename}"/>
+				</fileset>
+			</concat>
+		</foreach>
+
+	</target>
+
+	<target name="java-exists">
+		<if test="${not file::exists(JavaPath)}">
+			<fail message="You need to install java &amp; update your JavaPath property in ${LocalSettingsFile}"/>
+		</if>
+	</target>
+
+	<target name="compress-js">
+
+		<call target="java-exists"/>
+		<if test="${not file::exists(ClosureCompilerPath)}">
+			<fail message="You need to install Closure Compiler &amp; update your ClosureCompilerPath property in ${LocalSettingsFile}"/>
+		</if>
+
+		<foreach item="File" property="filename">
+			<in>
+				<items basedir="${DistPath}js/">
+					<include name="/**/*.js" />
+				</items>
+			</in>
+			<do>
+				<exec basedir="." program="${JavaPath}" commandline=" -jar &quot;${ClosureCompilerPath}&quot; --js &quot;${filename}&quot; --js_output_file &quot;${string::replace(filename, '.js', '.min.js')}&quot;" failonerror="true" />
+				<echo file="${SrcPath}js-files" append="true">&lt;script src="js/${string::replace( path::get-file-name(filename), '.js', '.min.js')}"&gt;&lt;/script&gt;</echo>
+			</do>
+		</foreach>
+	</target>
+
+	<target name="compress-css">
+
+		<call target="java-exists"/>
+		<if test="${not file::exists(YUICompressorPath)}">
+			<fail message="You need to install YUI Compressor &amp; update your YUICompressorPath property in ${LocalSettingsFile}"/>
+		</if>
+
+		<foreach item="File" property="filename">
+		  <in>
+			<items basedir="${SrcPath}css/">
+			  <include name="screen.css" />
+			  <include name="print.css" />
+			</items>
+		  </in>
+		  <do>
+			  <exec basedir="." program="${JavaPath}" commandline=" -jar &quot;${YUICompressorPath}&quot; --type css --charset utf-8 -o &quot;${DistPath}css/${path::get-file-name(filename)}&quot; &quot;${filename}&quot;" failonerror="true" />
+		  </do>
+		</foreach>
+	</target>
+
+	<target name="optimise-images">
+		<!-- PNG -->
+		<if test="${not file::exists(PNGCrushPath)}">
+			<fail message="You need to install PNG Crush &amp; update your PNGCrushPath property in ${LocalSettingsFile}"/>
+		</if>
+			<echo>${DistImagesPath}</echo>
+		<foreach item="File" property="filename">
+			<in>
+				<items basedir="${DistImagesPath}">
+					<include name="/**/*.png" />
+				</items>
+			</in>
+			<do>
+				<exec basedir="." program="${PNGCrushPath}" commandline=" -d ${DistImagesPath}opt -brute &quot;${filename}&quot;" failonerror="false" />
+			</do>
+		</foreach>
+
+		<!-- JPEG -->
+		<if test="${not file::exists(JPEGTranPath)}">
+			<fail message="You need to install JPEG Tran &amp; update your JPEGTranPath property in ${LocalSettingsFile}"/>
+		</if>
+		<foreach item="File" property="filename">
+			<in>
+				<items basedir="${DistImagesPath}">
+					<include name="/**/*.jp*g" />
+				</items>
+			</in>
+			<do>
+				<echo>${filename}</echo>
+				<exec basedir="." program="${JPEGTranPath}" commandline=" -copy none -optimise -outfile &quot;${filename}&quot; &quot;${filename}&quot;" failonerror="false" />
+			</do>
+		</foreach>
+
+		<!-- TODO: GIF -->
+
+		<!-- mvoe optimised images back to images dir -->
+		<move todir="${DistImagesPath}">
+			<fileset basedir="${DistImagesPath}opt">
+				<include name="*.*" />
+			</fileset>
+		</move>
+		<delete file="${DistImagesPath}opt/" />
+
+	</target>
+
+	<target name="sass-update">
+		<if test="${not file::exists(SASSPath)}">
+			<fail message="You need to install SASS &amp; update your SASSPath property in ${LocalSettingsFile}"/>
+		</if>
+		<echo>Updating SCSS files in ${SCSSPath}...</echo>
+		<echo>${SASSPath} -f --update ${SCSSPath}:${CSSPath}</echo>
+		<exec basedir="." program="${SASSPath}" commandline=" -f --update ${SCSSPath}:${CSSPath}" failonerror="true" />
+	</target>
+
+	<target name="sass-watch">
+		<if test="${not file::exists(SASSPath)}">
+			<fail message="You need to install SASS &amp; update your SASSPath property in ${LocalSettingsFile}"/>
+		</if>
+		<echo>Watching SCSS files in ${SCSSPath}...</echo>
+		<exec basedir="." program="${SASSPath}" commandline=" -g --watch ${SCSSPath}:${CSSPath}" failonerror="true" verbose="true" />
+	</target>
+
+</project>
