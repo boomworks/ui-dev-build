@@ -1,3 +1,5 @@
+Check out [the wiki](https://github.com/lindsayevans/ui-dev-build/wiki) for more information on how to get started
+
 _Run these from the src directory._
 
 #Compiling Sass stylesheets
