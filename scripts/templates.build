@@ -92,8 +92,20 @@
 
 		<echo file="${SrcPath}building" message="${Timestamp}" />
 
-		<!-- get files & stick in dist -->
-		<get src="${WebPath}/index.php" dest="${DistPath}/index.html" />
+		<!-- Save a copy of each PHP file in src directory to dist directory -->
+		<foreach item="File" property="filename">
+			<in>
+				<items basedir="${SrcPath}">
+					<include name="*.php" />
+				</items>
+			</in>
+			<do>
+				<get src="${WebPath}/index.php" dest="${DistPath}index.html" />
+			</do>
+		</foreach>
+
+		<!-- Get individual templates & stick in dist -->
+		<!--<get src="${WebPath}/index.php" dest="${DistPath}/index.html" />-->
 		<!--<get src="${WebPath}/_template.php" dest="${DistPath}/_template.html" />-->
 
 	</target>
