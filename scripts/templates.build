@@ -82,7 +82,6 @@
 
   
 	<target name="create-dist">
-		<echo file="${SrcPath}building" message="${Timestamp}" />
 		<mkdir dir="${DistPath}" />
 		<mkdir dir="${JSDistPath}" />
 		<mkdir dir="${CSSDistPath}" />
@@ -90,9 +89,11 @@
 	</target>
 
 	<target name="flatten-html">
+
+		<echo file="${SrcPath}building" message="${Timestamp}" />
+
 		<!-- get files & stick in dist -->
 		<get src="${WebPath}/index.php" dest="${DistPath}/index.html" />
-
 		<!--<get src="${WebPath}/_template.php" dest="${DistPath}/_template.html" />-->
 
 	</target>
