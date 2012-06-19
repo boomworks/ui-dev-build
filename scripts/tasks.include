@@ -102,12 +102,12 @@ TODO:
 
 		<foreach item="File" property="filename">
 		  <in>
-			<items basedir="${CSSDistPath}css/">
+			<items basedir="${CSSDistPath}">
 				<include name="/**/*.css" />
 			</items>
 		  </in>
 		  <do>
-			  <exec basedir="." program="${JavaPath}" commandline=" -jar &quot;${YUICompressorPath}&quot; --type css --charset utf-8 -o &quot;${CSSDistPath}${path::get-file-name(filename)}&quot; &quot;${filename}&quot;" failonerror="true" />
+			  <exec basedir="." program="${JavaPath}" commandline=" -jar &quot;${YUICompressorPath}&quot; --type css --charset utf-8 -o &quot;${CSSDistPath}/${path::get-file-name(filename)}&quot; &quot;${filename}&quot;" failonerror="true" />
 		  </do>
 		</foreach>
 	</target>

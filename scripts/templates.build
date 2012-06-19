@@ -109,8 +109,10 @@
 		</copy>
 		<copy todir="${CSSDistPath}">
 			<fileset basedir="${CSSPath}">
-				<include name="*.css" />
-				<!-- TODO: fonts directories etc. -->
+				<include name="**/*" />
+				<include name="*.svn" />
+				<include name="*.swp" />
+				<include name="*.tmp" />
 			</fileset>
 		</copy>
 		<copy todir="${JSDistPath}">
