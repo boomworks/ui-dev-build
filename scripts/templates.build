@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
-<project name="Gerard Kelly" default="deploy-prep" basedir="../">
+<project name="Project Name" default="deploy-prep" basedir="../">
 
-	<description>Build Gerard Kelly templates for delivery</description>
+	<description>Build Project Name templates for delivery</description>
 
 	<!-- override default app prefix (project name, lowercased, spaces replaced with dashes) like so:
-	<property name="AppPrefix" value="RamsOrig"/>
+	<property name="AppPrefix" value="ProjectName"/>
 	 -->
 
 	<!-- override default source directory (../src/) like so:
@@ -12,26 +12,44 @@
 	 -->
 
 	<!-- override default images directory (${SrcPath}images/) like so:
-	<property name="imagesPath" value="../source/images/"/>
+	<property name="imagesPath" value="../source/assets/images/"/>
 	 -->
 
 	<!-- override default SCSS directory (scss) like so:
-	<property name="SCSSPath" value="../source/scss/"/>
+	<property name="SCSSPath" value="../source/assets/scss/"/>
 	 -->
 
 	<!-- override default CSS directory (css) like so:
-	<property name="CSSPath" value="../source/css/"/>
+	<property name="CSSPath" value="../source/assets/css/"/>
+	 -->
+
+	<!-- override default JS directory (js) like so:
+	<property name="JSPath" value="../source/assets/js/"/>
 	 -->
 
 	<!-- override default dist directory (../dist/${Timestamp}) like so:
 	<property name="DistPath" value="../dist/r1/"/>
 	 -->
 
+	<!-- override default images dist directory (${DistPath}images/) like so:
+	<property name="imagesDistPath" value="${DistPath}assets/images/"/>
+	 -->
+	<!-- override default CSS dist directory (${DistPath}css) like so:
+	<property name="CSSDistPath" value="${DistPath}assets/css/"/>
+	 -->
+	<!-- override default JS dist directory (${DistPath}css) like so:
+	<property name="JSDistPath" value="${DistPath}assets/js/"/>
+	 -->
+
+
+	<!-- Which JS files to concat, in order -->
+	<property name="JSFiles" value="jquery-1.7.2.js project.js"/>
+
 	<property name="ScriptsPath" value="${path::get-directory-name(project::get-buildfile-path())}"/>
 	<include buildfile="${ScriptsPath}/tasks.include"/>
 
 	<!-- Base path used for the flatten-html target -->
-	<property name="WebPath" value="http://localhost:8080/gerardkelly/src"/>
+	<property name="WebPath" value="http://localhost:8080/ui-dev-build/src"/>
 
 	<target name="dev">
 		<echo>[Dev mode] ${AppPrefix} - ${Timestamp}</echo>
@@ -44,82 +62,58 @@
 
 		<call target="create-dist" />
 
-		<!--<call target="concatenate-js" />
-		<call target="compress-js" />-->
-
-		<call target="sass-update" />
-		<call target="compress-css" />
+		<!--<call target="sass-update" />-->
 
 		<call target="copy-assets" />
+
+		<call target="compress-css" />
+
+		<call target="concatenate-js" />
+		<call target="compress-js" />
+
 		<call target="optimise-images" />
 
 		<call target="flatten-html" />
 
-		<call target="cleanup-temp-files" />
-
-<!--
 		<call target="zip-dist-files" />
--->
+
+		<call target="cleanup-temp-files" />
 	</target>
 
   
 	<target name="create-dist">
 		<echo file="${SrcPath}building" message="${Timestamp}" />
 		<mkdir dir="${DistPath}" />
-		<mkdir dir="${DistPath}js/" />
-		<mkdir dir="${DistPath}css/" />
-		<mkdir dir="${DistPath}images/" />
+		<mkdir dir="${JSDistPath}" />
+		<mkdir dir="${CSSDistPath}" />
+		<mkdir dir="${imagesDistPath}" />
 	</target>
 
 	<target name="flatten-html">
 		<!-- get files & stick in dist -->
 		<get src="${WebPath}/index.php" dest="${DistPath}/index.html" />
 
-		<get src="${WebPath}/_article_template.php" dest="${DistPath}/_article_template.html" />
-		<get src="${WebPath}/_template.php" dest="${DistPath}/_template.html" />
-
-		<get src="${WebPath}/about.php" dest="${DistPath}/about.html" />
-		<get src="${WebPath}/articles.php" dest="${DistPath}/articles.html" />
-		<get src="${WebPath}/contacts.php" dest="${DistPath}/contacts.html" />
-		<get src="${WebPath}/armidale.php" dest="${DistPath}/armidale.html" />
-
-		<get src="${WebPath}/scannedarticle.php" dest="${DistPath}/scannedarticle.html" />
-		<get src="${WebPath}/easementissue.php" dest="${DistPath}/easementissue.html" />
-		<get src="${WebPath}/conveyact.php" dest="${DistPath}/conveyact.html" />
-		<get src="${WebPath}/torrensregistry.php" dest="${DistPath}/torrensregistry.html" />
-		<get src="${WebPath}/salearticle.php" dest="${DistPath}/salearticle.html" />
-		<get src="${WebPath}/journal.php" dest="${DistPath}/journal.html" />
-		<get src="${WebPath}/ajarticle.php" dest="${DistPath}/ajarticle.html" />
-		<get src="${WebPath}/dworkindissertation.php" dest="${DistPath}/dworkindissertation.html" />
-		<get src="${WebPath}/jurisprudence.php" dest="${DistPath}/jurisprudence.html" />
+		<!--<get src="${WebPath}/_template.php" dest="${DistPath}/_template.html" />-->
 
 	</target>
 
 	<target name="copy-assets">
-		<copy todir="${DistPath}images/">
-			<fileset basedir="${SrcPath}images">
+		<copy todir="${imagesDistPath}">
+			<fileset basedir="${imagesPath}">
 				<include name="*.png" />
 				<include name="*.*jp*g" />
 				<include name="*.gif" />
 				<include name="*.ico" />
 			</fileset>
 		</copy>
-		<copy todir="${DistPath}content_images/">
-			<fileset basedir="${SrcPath}content_images">
-				<include name="*.png" />
-				<include name="*.*jp*g" />
-				<include name="*.gif" />
-				<include name="*.ico" />
-			</fileset>
-		</copy>
-		<copy todir="${DistPath}css/">
-			<fileset basedir="${SrcPath}css">
+		<copy todir="${CSSDistPath}">
+			<fileset basedir="${CSSPath}">
 				<include name="*.css" />
 				<!-- TODO: fonts directories etc. -->
 			</fileset>
 		</copy>
-		<copy todir="${DistPath}js/">
-			<fileset basedir="${SrcPath}js">
+		<copy todir="${JSDistPath}">
+			<fileset basedir="${JSPath}">
 				<include name="*.js" />
 			</fileset>
 		</copy>

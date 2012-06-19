@@ -27,13 +27,16 @@ TODO:
 	<tstamp property="Timestamp" pattern="yyyyMMddHHmmss"/>
 
 	<property name="SrcPath" value="src/"/>
-	<property name="ImagesPath" value="${SrcPath}images/"/>
+	<property name="imagesPath" value="${SrcPath}images/"/>
 	<property name="SCSSPath" value="${SrcPath}scss"/>
 	<property name="CSSPath" value="${SrcPath}css"/>
+	<property name="JSPath" value="${SrcPath}js"/>
 
 	<property name="DistPath" value="dist/${Timestamp}/"/>
-	<property name="DistImagesPath" value="${DistPath}images/"/>
-	<property name="DistContentImagesPath" value="${DistPath}content_images/"/>
+	<property name="imagesDistPath" value="${DistPath}images/"/>
+	<property name="CSSDistPath" value="${DistPath}css"/>
+	<property name="JSDistPath" value="${DistPath}js"/>
+
 	<property name="DistZipPath" value="dist/${Timestamp}_${AppPrefix}_delivery.zip"/>
 
 	<target name="cleanup-temp-files">
@@ -55,9 +58,9 @@ TODO:
 
 		<property name="ConcattedFileName" value="${AppPrefix}-${Timestamp}.js"/>
 		<foreach item="String" in="${JSFiles}" delim=" " property="filename">
-			<concat destfile="${DistPath}js/${ConcattedFileName}" append="true">
+			<concat destfile="${JSDistPath}/${ConcattedFileName}" append="true">
 				<fileset>
-					<include name="${SrcPath}js/${filename}"/>
+					<include name="${JSDistPath}/${filename}"/>
 				</fileset>
 			</concat>
 		</foreach>
@@ -79,7 +82,7 @@ TODO:
 
 		<foreach item="File" property="filename">
 			<in>
-				<items basedir="${DistPath}js/">
+				<items basedir="${JSDistPath}">
 					<include name="/**/*.js" />
 				</items>
 			</in>
@@ -99,13 +102,12 @@ TODO:
 
 		<foreach item="File" property="filename">
 		  <in>
-			<items basedir="${SrcPath}css/">
-			  <include name="screen.css" />
-			  <include name="print.css" />
+			<items basedir="${CSSDistPath}css/">
+				<include name="/**/*.css" />
 			</items>
 		  </in>
 		  <do>
-			  <exec basedir="." program="${JavaPath}" commandline=" -jar &quot;${YUICompressorPath}&quot; --type css --charset utf-8 -o &quot;${DistPath}css/${path::get-file-name(filename)}&quot; &quot;${filename}&quot;" failonerror="true" />
+			  <exec basedir="." program="${JavaPath}" commandline=" -jar &quot;${YUICompressorPath}&quot; --type css --charset utf-8 -o &quot;${CSSDistPath}${path::get-file-name(filename)}&quot; &quot;${filename}&quot;" failonerror="true" />
 		  </do>
 		</foreach>
 	</target>
@@ -115,15 +117,15 @@ TODO:
 		<if test="${not file::exists(PNGCrushPath)}">
 			<fail message="You need to install PNG Crush &amp; update your PNGCrushPath property in ${LocalSettingsFile}"/>
 		</if>
-			<echo>${DistImagesPath}</echo>
+			<echo>${imagesDistPath}</echo>
 		<foreach item="File" property="filename">
 			<in>
-				<items basedir="${DistImagesPath}">
+				<items basedir="${imagesDistPath}">
 					<include name="/**/*.png" />
 				</items>
 			</in>
 			<do>
-				<exec basedir="." program="${PNGCrushPath}" commandline=" -d ${DistImagesPath}opt -brute &quot;${filename}&quot;" failonerror="false" />
+				<exec basedir="." program="${PNGCrushPath}" commandline=" -d ${imagesDistPath}opt -brute &quot;${filename}&quot;" failonerror="false" />
 			</do>
 		</foreach>
 
@@ -133,7 +135,7 @@ TODO:
 		</if>
 		<foreach item="File" property="filename">
 			<in>
-				<items basedir="${DistImagesPath}">
+				<items basedir="${imagesDistPath}">
 					<include name="/**/*.jp*g" />
 				</items>
 			</in>
@@ -146,12 +148,12 @@ TODO:
 		<!-- TODO: GIF -->
 
 		<!-- mvoe optimised images back to images dir -->
-		<move todir="${DistImagesPath}">
-			<fileset basedir="${DistImagesPath}opt">
+		<move todir="${imagesDistPath}">
+			<fileset basedir="${imagesDistPath}opt">
 				<include name="*.*" />
 			</fileset>
 		</move>
-		<delete file="${DistImagesPath}opt/" />
+		<delete file="${imagesDistPath}opt/" />
 
 	</target>
 
