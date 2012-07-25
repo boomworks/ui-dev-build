@@ -63,7 +63,6 @@
 		<call target="create-dist" />
 
 		<!--<call target="sass-update" />-->
-
 		<call target="copy-assets" />
 
 		<call target="compress-css" />
@@ -72,7 +71,6 @@
 		<call target="compress-js" />
 
 		<call target="optimise-images" />
-
 		<call target="flatten-html" />
 
 		<call target="zip-dist-files" />
@@ -100,7 +98,7 @@
 				</items>
 			</in>
 			<do>
-				<get src="${WebPath}/index.php" dest="${DistPath}index.html" />
+				<get src="${WebPath}/${path::get-file-name(filename)}" dest="${DistPath}${path::get-file-name-without-extension(filename)}.html" />
 			</do>
 		</foreach>
 
@@ -113,23 +111,32 @@
 	<target name="copy-assets">
 		<copy todir="${imagesDistPath}">
 			<fileset basedir="${imagesPath}">
-				<include name="*.png" />
-				<include name="*.*jp*g" />
-				<include name="*.gif" />
-				<include name="*.ico" />
+				<include name="**/*" />
+				<exclude name="**/*.svn" />
+				<exclude name="**/*.swp" />
+				<exclude name="**/*.tmp" />
+				<exclude name="**/.DS_Store" />
+				<exclude name="**/Thumbs.db" />
 			</fileset>
 		</copy>
 		<copy todir="${CSSDistPath}">
 			<fileset basedir="${CSSPath}">
 				<include name="**/*" />
-				<include name="*.svn" />
-				<include name="*.swp" />
-				<include name="*.tmp" />
+				<exclude name="**/*.svn" />
+				<exclude name="**/*.swp" />
+				<exclude name="**/*.tmp" />
+				<exclude name="**/.DS_Store" />
+				<exclude name="**/Thumbs.db" />
 			</fileset>
 		</copy>
 		<copy todir="${JSDistPath}">
 			<fileset basedir="${JSPath}">
-				<include name="*.js" />
+				<include name="**/*" />
+				<exclude name="**/*.svn" />
+				<exclude name="**/*.swp" />
+				<exclude name="**/*.tmp" />
+				<exclude name="**/.DS_Store" />
+				<exclude name="**/Thumbs.db" />
 			</fileset>
 		</copy>
 	</target>

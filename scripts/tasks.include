@@ -113,6 +113,9 @@ TODO:
 	</target>
 
 	<target name="optimise-images">
+
+		<!-- TODO: make sure it's running over imaegs in subdirectories -->
+
 		<!-- PNG -->
 		<if test="${not file::exists(PNGCrushPath)}">
 			<fail message="You need to install PNG Crush &amp; update your PNGCrushPath property in ${LocalSettingsFile}"/>
@@ -121,7 +124,7 @@ TODO:
 		<foreach item="File" property="filename">
 			<in>
 				<items basedir="${imagesDistPath}">
-					<include name="/**/*.png" />
+					<include name="**/*.png" />
 				</items>
 			</in>
 			<do>
@@ -136,7 +139,7 @@ TODO:
 		<foreach item="File" property="filename">
 			<in>
 				<items basedir="${imagesDistPath}">
-					<include name="/**/*.jp*g" />
+					<include name="**/*.jp*g" />
 				</items>
 			</in>
 			<do>
@@ -150,10 +153,10 @@ TODO:
 		<!-- mvoe optimised images back to images dir -->
 		<move todir="${imagesDistPath}">
 			<fileset basedir="${imagesDistPath}opt">
-				<include name="*.*" />
+				<include name="**/*.*" />
 			</fileset>
 		</move>
-		<delete file="${imagesDistPath}opt/" />
+		<delete dir="${imagesDistPath}opt" />
 
 	</target>
 
