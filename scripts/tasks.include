@@ -114,13 +114,11 @@ TODO:
 
 	<target name="optimise-images">
 
-		<!-- TODO: make sure it's running over imaegs in subdirectories -->
-
 		<!-- PNG -->
 		<if test="${not file::exists(PNGCrushPath)}">
 			<fail message="You need to install PNG Crush &amp; update your PNGCrushPath property in ${LocalSettingsFile}"/>
 		</if>
-			<echo>${imagesDistPath}</echo>
+		<echo>${imagesDistPath}</echo>
 		<foreach item="File" property="filename">
 			<in>
 				<items basedir="${imagesDistPath}">
@@ -128,7 +126,8 @@ TODO:
 				</items>
 			</in>
 			<do>
-				<exec basedir="." program="${PNGCrushPath}" commandline=" -d ${imagesDistPath}opt -brute &quot;${filename}&quot;" failonerror="false" />
+				<!--<exec basedir="." program="${PNGCrushPath}" commandline=" -d ${imagesDistPath}opt -brute &quot;${filename}&quot;" failonerror="false" />-->
+				<exec basedir="." program="${PNGCrushPath}" commandline=" -brute -e -optimised.png &quot;${filename}&quot; &quot;${filename}&quot;" failonerror="false" />
 			</do>
 		</foreach>
 
@@ -150,13 +149,18 @@ TODO:
 
 		<!-- TODO: GIF -->
 
-		<!-- mvoe optimised images back to images dir -->
-		<move todir="${imagesDistPath}">
-			<fileset basedir="${imagesDistPath}opt">
-				<include name="**/*.*" />
-			</fileset>
-		</move>
-		<delete dir="${imagesDistPath}opt" />
+		<!-- Replace images with their optimised versions -->
+		<foreach item="File" property="filename">
+			<in>
+				<items basedir="${imagesDistPath}">
+					<include name="**/*-optimised.png" />
+				</items>
+			</in>
+			<do>
+				<echo>Moving ${filename} to ${string::replace(filename, '-optimised.png', '.png')}</echo>
+				<move file="${filename}" tofile="${string::replace(filename, '-optimised.png', '.png')}"/>
+			</do>
+		</foreach>
 
 	</target>
 
