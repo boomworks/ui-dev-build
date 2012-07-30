@@ -130,7 +130,7 @@ TODO:
 			</in>
 			<do>
 				<!--<exec basedir="." program="${PNGCrushPath}" commandline=" -d ${imagesDistPath}opt -brute &quot;${filename}&quot;" failonerror="false" />-->
-				<exec basedir="." program="${PNGCrushPath}" commandline=" -brute -e -optimised.png &quot;${filename}&quot; &quot;${filename}&quot;" failonerror="false" />
+				<exec basedir="." program="${PNGCrushPath}" commandline="-q  -brute -e -optimised.png &quot;${filename}&quot; &quot;${filename}&quot;" failonerror="false" />
 			</do>
 		</foreach>
 
