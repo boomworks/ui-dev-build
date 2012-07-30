@@ -64,6 +64,8 @@
 
 	<target name="deploy-prep">
 
+		<property name="nant.onfailure" value="deploy-prep-failure"/>
+
 		<echo>${AppPrefix} - ${Timestamp}</echo>
 
 		<call target="create-dist" />
@@ -86,6 +88,12 @@
 		<call target="cleanup-temp-files" />
 	</target>
 
+
+	<!-- Tasks to be executed if the build fails (temp file cleanup, logging, etc.) -->
+	<target name="deploy-prep-failure">
+		<echo>Build failed, cleaning up temp files...</echo>
+		<call target="cleanup-temp-files" />
+	</target>
   
 	<target name="create-dist">
 		<mkdir dir="${DistPath}" />
