@@ -1,3 +1,3 @@
 @echo off
-nant -buildfile:templates.build
+nant -buildfile:%~dp0templates.build
 pause
