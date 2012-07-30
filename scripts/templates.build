@@ -34,6 +34,10 @@
 	<property name="JSPath" value="../source/assets/js/"/>
 	 -->
 
+	<!-- override default js-file content like so:
+	<property name="JSFilesTemplate" value="&lt;script src=&quot;/assets/js/{AppPrefix}-{Timestamp}.min.js&quot;&gt;&lt;/script&gt;"/>
+	 -->
+
 	<!-- override default dist directory (../dist/${Timestamp}) like so:
 	<property name="DistPath" value="../dist/r1/"/>
 	 -->
