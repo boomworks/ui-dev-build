@@ -37,6 +37,8 @@ TODO:
 	<property name="CSSDistPath" value="${DistPath}css"/>
 	<property name="JSDistPath" value="${DistPath}js"/>
 
+	<property name="JSFilesTemplate" value="&lt;script src=&quot;js/{AppPrefix}-{Timestamp}.min.js&quot;&gt;&lt;/script&gt;"/>
+
 	<property name="DistZipPath" value="dist/${Timestamp}_${AppPrefix}_delivery.zip"/>
 
 	<target name="cleanup-temp-files">
@@ -65,8 +67,7 @@ TODO:
 			</concat>
 		</foreach>
 
-		<!-- TODO: work out src path automagically; make a template -->
-		<echo file="${SrcPath}js-files" append="true">&lt;script src="js/${AppPrefix}-${Timestamp}.min.js"&gt;&lt;/script&gt;</echo>
+		<echo file="${SrcPath}js-files" append="true">${string::replace(string::replace(JSFilesTemplate, '{Timestamp}', Timestamp), '{AppPrefix}', AppPrefix)}</echo>
 
 	</target>
 
