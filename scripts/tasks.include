@@ -65,6 +65,9 @@ TODO:
 			</concat>
 		</foreach>
 
+		<!-- TODO: work out src path automagically; make a template -->
+		<echo file="${SrcPath}js-files" append="true">&lt;script src="js/${AppPrefix}-${Timestamp}.min.js"&gt;&lt;/script&gt;</echo>
+
 	</target>
 
 	<target name="java-exists">
@@ -83,12 +86,11 @@ TODO:
 		<foreach item="File" property="filename">
 			<in>
 				<items basedir="${JSDistPath}">
-					<include name="/**/*.js" />
+					<include name="**/*.js" />
 				</items>
 			</in>
 			<do>
 				<exec basedir="." program="${JavaPath}" commandline=" -jar &quot;${ClosureCompilerPath}&quot; --js &quot;${filename}&quot; --js_output_file &quot;${string::replace(filename, '.js', '.min.js')}&quot;" failonerror="true" />
-				<echo file="${SrcPath}js-files" append="true">&lt;script src="js/${string::replace( path::get-file-name(filename), '.js', '.min.js')}"&gt;&lt;/script&gt;</echo>
 			</do>
 		</foreach>
 	</target>

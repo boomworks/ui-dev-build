@@ -3,6 +3,13 @@
 
 	<description>Build Project Name templates for delivery</description>
 
+	<!-- Which JS files to concat, in order -->
+	<property name="JSFiles" value="jquery-1.7.2.js project.js"/>
+
+
+	<property name="ScriptsPath" value="${path::get-directory-name(project::get-buildfile-path())}"/>
+	<include buildfile="${ScriptsPath}/tasks.include"/>
+
 	<!-- override default app prefix (project name, lowercased, spaces replaced with dashes) like so:
 	<property name="AppPrefix" value="ProjectName"/>
 	 -->
@@ -34,19 +41,14 @@
 	<!-- override default images dist directory (${DistPath}images/) like so:
 	<property name="imagesDistPath" value="${DistPath}assets/images/"/>
 	 -->
+
 	<!-- override default CSS dist directory (${DistPath}css) like so:
 	<property name="CSSDistPath" value="${DistPath}assets/css/"/>
 	 -->
+
 	<!-- override default JS dist directory (${DistPath}css) like so:
 	<property name="JSDistPath" value="${DistPath}assets/js/"/>
 	 -->
-
-
-	<!-- Which JS files to concat, in order -->
-	<property name="JSFiles" value="jquery-1.7.2.js project.js"/>
-
-	<property name="ScriptsPath" value="${path::get-directory-name(project::get-buildfile-path())}"/>
-	<include buildfile="${ScriptsPath}/tasks.include"/>
 
 	<!-- Base path used for the flatten-html target -->
 	<property name="WebPath" value="http://localhost:8080/ui-dev-build/src"/>
@@ -63,6 +65,7 @@
 		<call target="create-dist" />
 
 		<!--<call target="sass-update" />-->
+
 		<call target="copy-assets" />
 
 		<call target="compress-css" />
@@ -71,6 +74,7 @@
 		<call target="compress-js" />
 
 		<call target="optimise-images" />
+
 		<call target="flatten-html" />
 
 		<call target="zip-dist-files" />
