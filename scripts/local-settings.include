@@ -7,6 +7,10 @@
 	<property name="YUICompressorPath" value="C:\Program Files\yuicompressor-2.4.7\build\yuicompressor-2.4.7.jar"/>
 	<property name="PNGCrushPath" value="C:\Program Files\pngcrush\pngcrush.exe"/>
 	<property name="JPEGTranPath" value="C:\Program Files\jpegtran\jpegtran.exe"/>
+	<property name="GifsiclePath" value="C:\Program Files\Gifsicle\bin\gifsicle.exe"/>
+
 	<property name="SASSPath" value="C:\Ruby187\bin\sass.bat"/>
+	
+	<property name="JavaScriptLintPath" value="C:\Program Files\jsl-0.3.0\jsl.exe"/>
 
 </project>

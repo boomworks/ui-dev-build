@@ -172,7 +172,20 @@ TODO:
 			</do>
 		</foreach>
 
-		<!-- TODO: GIF -->
+		<!-- GIF -->
+		<if test="${not file::exists(GifsiclePath)}">
+			<fail message="You need to install gifsicle &amp; update your GifsiclePath property in ${LocalSettingsFile}"/>
+		</if>
+		<foreach item="File" property="filename">
+			<in>
+				<items basedir="${imagesDistPath}">
+					<include name="**/*.gif" />
+				</items>
+			</in>
+			<do>
+				<exec basedir="." program="${GifsiclePath}" commandline=" --batch -O3 &quot;${filename}&quot;" failonerror="false"/>
+			</do>
+		</foreach>
 
 		<!-- Replace images with their optimised versions -->
 		<foreach item="File" property="filename">
