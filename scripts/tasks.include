@@ -37,6 +37,7 @@ TODO:
 	<property name="CSSDistPath" value="${DistPath}css"/>
 	<property name="JSDistPath" value="${DistPath}js"/>
 
+	<property name="JSConcattedFileName" value="${AppPrefix}-${Timestamp}.js"/>
 	<property name="JSFilesTemplate" value="&lt;script src=&quot;js/{AppPrefix}-{Timestamp}.min.js&quot;&gt;&lt;/script&gt;"/>
 
 	<property name="DistZipPath" value="dist/${Timestamp}_${AppPrefix}_delivery.zip"/>
@@ -58,9 +59,8 @@ TODO:
 
 	<target name="concatenate-js">
 
-		<property name="ConcattedFileName" value="${AppPrefix}-${Timestamp}.js"/>
 		<foreach item="String" in="${JSFiles}" delim=" " property="filename">
-			<concat destfile="${JSDistPath}/${ConcattedFileName}" append="true">
+			<concat destfile="${JSDistPath}/${JSConcattedFileName}" append="true">
 				<fileset>
 					<include name="${JSDistPath}/${filename}"/>
 				</fileset>
@@ -84,16 +84,25 @@ TODO:
 			<fail message="You need to install Closure Compiler &amp; update your ClosureCompilerPath property in ${LocalSettingsFile}"/>
 		</if>
 
-		<foreach item="File" property="filename">
-			<in>
-				<items basedir="${JSDistPath}">
-					<include name="**/*.js" />
-				</items>
-			</in>
-			<do>
-				<exec basedir="." program="${JavaPath}" commandline=" -jar &quot;${ClosureCompilerPath}&quot; --js &quot;${filename}&quot; --js_output_file &quot;${string::replace(filename, '.js', '.min.js')}&quot;" failonerror="true" />
-			</do>
-		</foreach>
+		<!-- Assume we're concatting & only compress the resulting file -->
+		<if test="${property::exists('JSFiles')}">
+			<property name="filename" value="${JSDistPath}/${JSConcattedFileName}"/>
+			<exec basedir="." program="${JavaPath}" commandline=" -jar &quot;${ClosureCompilerPath}&quot; --js &quot;${filename}&quot; --js_output_file &quot;${string::replace(filename, '.js', '.min.js')}&quot;" failonerror="true" />
+		</if>
+
+		<!-- otherwise compress everything in JS directory -->
+		<ifnot test="${property::exists('JSFiles')}">
+			<foreach item="File" property="filename">
+				<in>
+					<items basedir="${JSDistPath}">
+						<include name="**/*.js" />
+					</items>
+				</in>
+				<do>
+					<exec basedir="." program="${JavaPath}" commandline=" -jar &quot;${ClosureCompilerPath}&quot; --js &quot;${filename}&quot; --js_output_file &quot;${string::replace(filename, '.js', '.min.js')}&quot;" failonerror="true" />
+				</do>
+			</foreach>
+		</ifnot>
 	</target>
 
 	<target name="compress-css">
