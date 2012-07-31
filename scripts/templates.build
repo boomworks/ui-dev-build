@@ -4,8 +4,10 @@
 	<description>Build Project Name templates for delivery</description>
 
 	<!-- Which JS files to concat, in order -->
-	<property name="JSFiles" value="jquery-1.7.2.js project.js"/>
+	<property name="JSConcatFiles" value="jquery-1.7.2.js project.js"/>
 
+	<!-- Which JS files to lint -->
+	<property name="JSLintFiles" value="project.js"/>
 
 	<property name="ScriptsPath" value="${path::get-directory-name(project::get-buildfile-path())}"/>
 	<include buildfile="${ScriptsPath}/tasks.include"/>
@@ -76,6 +78,7 @@
 
 		<call target="compress-css" />
 
+		<call target="lint-js" />
 		<call target="concatenate-js" />
 		<call target="compress-js" />
 

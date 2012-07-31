@@ -57,9 +57,29 @@ TODO:
 	</target>
 
 
+	<target name="java-exists">
+		<if test="${not file::exists(JavaPath)}">
+			<fail message="You need to install java &amp; update your JavaPath property in ${LocalSettingsFile}"/>
+		</if>
+	</target>
+
+	<target name="lint-js">
+		<if test="${not file::exists(JavaScriptLintPath)}">
+			<fail message="You need to install JavaScript Lint &amp; update your JavaScriptLintPath property in ${LocalSettingsFile}"/>
+		</if>
+
+		<if test="${property::exists('JSLintFiles')}">
+			<foreach item="String" in="${JSLintFiles}" delim=" " property="filename">
+				<property name="filename" value="${JSDistPath}/${filename}"/>
+				<exec basedir="." program="${JavaScriptLintPath}" commandline=" -nologo -conf &quot;${ScriptsPath}/jsl.conf&quot; -process &quot;${filename}&quot;" failonerror="true" />
+			</foreach>
+		</if>
+
+	</target>
+
 	<target name="concatenate-js">
 
-		<foreach item="String" in="${JSFiles}" delim=" " property="filename">
+		<foreach item="String" in="${JSConcatFiles}" delim=" " property="filename">
 			<concat destfile="${JSDistPath}/${JSConcattedFileName}" append="true">
 				<fileset>
 					<include name="${JSDistPath}/${filename}"/>
@@ -71,12 +91,6 @@ TODO:
 
 	</target>
 
-	<target name="java-exists">
-		<if test="${not file::exists(JavaPath)}">
-			<fail message="You need to install java &amp; update your JavaPath property in ${LocalSettingsFile}"/>
-		</if>
-	</target>
-
 	<target name="compress-js">
 
 		<call target="java-exists"/>
@@ -85,13 +99,13 @@ TODO:
 		</if>
 
 		<!-- Assume we're concatting & only compress the resulting file -->
-		<if test="${property::exists('JSFiles')}">
+		<if test="${property::exists('JSConcatFiles')}">
 			<property name="filename" value="${JSDistPath}/${JSConcattedFileName}"/>
-			<exec basedir="." program="${JavaPath}" commandline=" -jar &quot;${ClosureCompilerPath}&quot; --js &quot;${filename}&quot; --js_output_file &quot;${string::replace(filename, '.js', '.min.js')}&quot;" failonerror="true" />
+			<exec basedir="." program="${JavaPath}" commandline=" -jar &quot;${ClosureCompilerPath}&quot; --compilation_level SIMPLE_OPTIMIZATIONS --js &quot;${filename}&quot; --js_output_file &quot;${string::replace(filename, '.js', '.min.js')}&quot;" failonerror="true" />
 		</if>
 
 		<!-- otherwise compress everything in JS directory -->
-		<ifnot test="${property::exists('JSFiles')}">
+		<if test="true" unless="${property::exists('JSConcatFiles')}">
 			<foreach item="File" property="filename">
 				<in>
 					<items basedir="${JSDistPath}">
@@ -102,7 +116,7 @@ TODO:
 					<exec basedir="." program="${JavaPath}" commandline=" -jar &quot;${ClosureCompilerPath}&quot; --js &quot;${filename}&quot; --js_output_file &quot;${string::replace(filename, '.js', '.min.js')}&quot;" failonerror="true" />
 				</do>
 			</foreach>
-		</ifnot>
+		</if>
 	</target>
 
 	<target name="compress-css">
@@ -130,7 +144,7 @@ TODO:
 		<if test="${not file::exists(PNGCrushPath)}">
 			<fail message="You need to install PNG Crush &amp; update your PNGCrushPath property in ${LocalSettingsFile}"/>
 		</if>
-		<echo>${imagesDistPath}</echo>
+
 		<foreach item="File" property="filename">
 			<in>
 				<items basedir="${imagesDistPath}">
@@ -154,7 +168,6 @@ TODO:
 				</items>
 			</in>
 			<do>
-				<echo>${filename}</echo>
 				<exec basedir="." program="${JPEGTranPath}" commandline=" -copy none -optimise -outfile &quot;${filename}&quot; &quot;${filename}&quot;" failonerror="false" />
 			</do>
 		</foreach>
@@ -169,7 +182,6 @@ TODO:
 				</items>
 			</in>
 			<do>
-				<echo>Moving ${filename} to ${string::replace(filename, '-optimised.png', '.png')}</echo>
 				<move file="${filename}" tofile="${string::replace(filename, '-optimised.png', '.png')}"/>
 			</do>
 		</foreach>
