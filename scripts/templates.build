@@ -87,6 +87,8 @@
 		<call target="flatten-html" />
 
 		<call target="zip-dist-files" />
+		<!--<call target="gzip-dist-files" />-->
+		<!--<call target="bzip-dist-files" />-->
 
 		<call target="cleanup-temp-files" />
 
