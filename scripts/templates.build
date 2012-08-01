@@ -89,6 +89,10 @@
 		<call target="zip-dist-files" />
 
 		<call target="cleanup-temp-files" />
+
+		<echo>dist: ${DistPath}</echo>
+		<echo>zip: ${DistZipPath}</echo>
+
 	</target>
 
 
