@@ -15,9 +15,19 @@ TODO:
 
 	<include buildfile="${LocalSettingsFile}"/>
 
-	<if test="${not file::exists(NAntContribPath)}">
-		<fail message="You need to install NAntContrib &amp; update your NAntContribPath property in ${LocalSettingsFile}"/>
-	</if>
+
+	
+	<target name="check-dependency">
+		<if test="${not property::exists(dependency-path-property) or not file::exists(property::get-value(dependency-path-property))}">
+			<fail message="You need to install ${dependency-name} &amp; add/update the ${dependency-path-property} property in ${LocalSettingsFile}"/>
+		</if>
+	</target>
+
+
+	<property name="dependency-name" value="NAnt Contrib"/>
+	<property name="dependency-path-property" value="NAntContribPath"/>
+	<call target="check-dependency" />
+
 	<loadtasks assembly="${NAntContribPath}" />
 
 	<property name="AppPrefix" value="${string::to-lower(string::replace(project::get-name(), ' ', '-'))}" unless="${property::exists('AppPrefix')}"/>
@@ -58,15 +68,15 @@ TODO:
 
 
 	<target name="java-exists">
-		<if test="${not file::exists(JavaPath)}">
-			<fail message="You need to install java &amp; update your JavaPath property in ${LocalSettingsFile}"/>
-		</if>
+		<property name="dependency-name" value="Java"/>
+		<property name="dependency-path-property" value="JavaPath"/>
+		<call target="check-dependency" />
 	</target>
 
 	<target name="lint-js">
-		<if test="${not file::exists(JavaScriptLintPath)}">
-			<fail message="You need to install JavaScript Lint &amp; update your JavaScriptLintPath property in ${LocalSettingsFile}"/>
-		</if>
+		<property name="dependency-name" value="JavaScript Lint"/>
+		<property name="dependency-path-property" value="JavaScriptLintPath"/>
+		<call target="check-dependency" />
 
 		<if test="${property::exists('JSLintFiles')}">
 			<foreach item="String" in="${JSLintFiles}" delim=" " property="filename">
@@ -94,9 +104,9 @@ TODO:
 	<target name="compress-js">
 
 		<call target="java-exists"/>
-		<if test="${not file::exists(ClosureCompilerPath)}">
-			<fail message="You need to install Closure Compiler &amp; update your ClosureCompilerPath property in ${LocalSettingsFile}"/>
-		</if>
+		<property name="dependency-name" value="Closure Compiler"/>
+		<property name="dependency-path-property" value="ClosureCompilerPath"/>
+		<call target="check-dependency" />
 
 		<!-- Assume we're concatting & only compress the resulting file -->
 		<if test="${property::exists('JSConcatFiles')}">
@@ -122,9 +132,9 @@ TODO:
 	<target name="compress-css">
 
 		<call target="java-exists"/>
-		<if test="${not file::exists(YUICompressorPath)}">
-			<fail message="You need to install YUI Compressor &amp; update your YUICompressorPath property in ${LocalSettingsFile}"/>
-		</if>
+		<property name="dependency-name" value="YUI Compressor"/>
+		<property name="dependency-path-property" value="YUICompressorPath"/>
+		<call target="check-dependency" />
 
 		<foreach item="File" property="filename">
 		  <in>
@@ -141,9 +151,9 @@ TODO:
 	<target name="optimise-images">
 
 		<!-- PNG -->
-		<if test="${not file::exists(PNGCrushPath)}">
-			<fail message="You need to install PNG Crush &amp; update your PNGCrushPath property in ${LocalSettingsFile}"/>
-		</if>
+		<property name="dependency-name" value="PNG Crush"/>
+		<property name="dependency-path-property" value="PNGCrushPath"/>
+		<call target="check-dependency" />
 
 		<foreach item="File" property="filename">
 			<in>
@@ -158,9 +168,10 @@ TODO:
 		</foreach>
 
 		<!-- JPEG -->
-		<if test="${not file::exists(JPEGTranPath)}">
-			<fail message="You need to install JPEG Tran &amp; update your JPEGTranPath property in ${LocalSettingsFile}"/>
-		</if>
+		<property name="dependency-name" value="JPEG Tran"/>
+		<property name="dependency-path-property" value="JPEGTranPath"/>
+		<call target="check-dependency" />
+
 		<foreach item="File" property="filename">
 			<in>
 				<items basedir="${imagesDistPath}">
@@ -173,9 +184,10 @@ TODO:
 		</foreach>
 
 		<!-- GIF -->
-		<if test="${not file::exists(GifsiclePath)}">
-			<fail message="You need to install gifsicle &amp; update your GifsiclePath property in ${LocalSettingsFile}"/>
-		</if>
+		<property name="dependency-name" value="gifsicle"/>
+		<property name="dependency-path-property" value="GifsiclePath"/>
+		<call target="check-dependency" />
+
 		<foreach item="File" property="filename">
 			<in>
 				<items basedir="${imagesDistPath}">
@@ -202,18 +214,20 @@ TODO:
 	</target>
 
 	<target name="sass-update">
-		<if test="${not file::exists(SASSPath)}">
-			<fail message="You need to install SASS &amp; update your SASSPath property in ${LocalSettingsFile}"/>
-		</if>
+		<property name="dependency-name" value="SASS"/>
+		<property name="dependency-path-property" value="SASSPath"/>
+		<call target="check-dependency" />
+
 		<echo>Updating SCSS files in ${SCSSPath}...</echo>
 		<echo>${SASSPath} -f --update ${SCSSPath}:${CSSPath}</echo>
 		<exec basedir="." program="${SASSPath}" commandline=" -f --update ${SCSSPath}:${CSSPath}" failonerror="true" />
 	</target>
 
 	<target name="sass-watch">
-		<if test="${not file::exists(SASSPath)}">
-			<fail message="You need to install SASS &amp; update your SASSPath property in ${LocalSettingsFile}"/>
-		</if>
+		<property name="dependency-name" value="SASS"/>
+		<property name="dependency-path-property" value="SASSPath"/>
+		<call target="check-dependency" />
+
 		<echo>Watching SCSS files in ${SCSSPath}...</echo>
 		<exec basedir="." program="${SASSPath}" commandline=" -g --watch ${SCSSPath}:${CSSPath}" failonerror="true" verbose="true" />
 	</target>
