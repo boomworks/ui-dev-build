@@ -14,8 +14,9 @@ TODO:
 	</if>
 
 	<include buildfile="${LocalSettingsFile}"/>
-
-
+	<if test="${file::exists(ScriptsPath + '/local-project-settings.include')}">
+		<include buildfile="local-project-settings.include"/>
+	</if>
 	
 	<target name="check-dependency">
 		<if test="${not property::exists(dependency-path-property) or not file::exists(property::get-value(dependency-path-property))}">

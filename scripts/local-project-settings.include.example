@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<project>
+
+	<!-- Base path used for the flatten-html target -->
+	<property name="WebPath" value="http://localhost:8080/ui-dev-build/src"/>
+
+</project>

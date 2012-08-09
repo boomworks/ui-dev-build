@@ -57,7 +57,8 @@
 	 -->
 
 	<!-- Base path used for the flatten-html target -->
-	<property name="WebPath" value="http://localhost:8080/ui-dev-build/src"/>
+	<!-- Thsi is being set in local-project-settings.include now -->
+	<!--<property name="WebPath" value="http://localhost:8080/ui-dev-build/src"/>-->
 
 	<target name="dev">
 		<echo>[Dev mode] ${AppPrefix} - ${Timestamp}</echo>
