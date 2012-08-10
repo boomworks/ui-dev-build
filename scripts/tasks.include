@@ -345,10 +345,9 @@ TODO:
 
 		<!-- TODO: output if stuff has been updated & which version -->
 
-		<!-- TODO: this doesn't work if the repo is private
-		<get src="https://github.com/lindsayevans/ui-dev-build/zipball/master" dest="ui-dev-build.zip" usetimestamp="true" failonerror="true"/> -->
-		<!-- TODO: notify user if get error? How about if up to date? How do we know? -->
+		<get src="https://github.com/boomworks/ui-dev-build/zipball/master" dest="${ScriptsPath}/ui-dev-build.zip" usetimestamp="true" failonerror="true"/>
 
+		<!-- TODO: notify user if get error? How about if up to date? How do we know? -->
 		<if test="${not file::exists(ScriptsPath + '/ui-dev-build.zip')}">
 			<fail message="Couldn't download the latest package from GitHub for some reason. Try again later"/>
 		</if>
@@ -357,17 +356,15 @@ TODO:
 
 			<unzip zipfile="${ScriptsPath}/ui-dev-build.zip"/>
 
-			<!-- TODO: remove '-test' when it's all working properly & update functionality has been added to teh repo -->
-			<!-- Otherwise we'll update the build script with an unupdatable copy of itself ;) -->
-			<move todir="${ScriptsPath}-test" flatten="true" overwrite="true">
+			<move todir="${ScriptsPath}" flatten="true" overwrite="true">
 				<fileset>
-					<include name="lindsayevans-ui-dev-build-*/scripts/*" />
+					<include name="boomworks-ui-dev-build-*/scripts/*" />
 				</fileset>
 			</move>
 
 			<delete verbose="true">
 				<fileset>
-					<include name="lindsayevans-ui-dev-build-**" />
+					<include name="boomworks-ui-dev-build-**" />
 					<include name="${ScriptsPath}/ui-dev-build.zip" />
 				</fileset>
 			</delete>
@@ -375,6 +372,5 @@ TODO:
 		</if>
 
 	</target>
-
 
 </project>
