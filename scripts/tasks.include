@@ -6,7 +6,7 @@ TODO:
 -->
 <project>
 
-	<property name="BuildScriptVersion" value="1.0.0"/>
+	<property name="BuildScriptVersion" value="1.0.1"/>
 
 	<!-- Include machine specific properties -->
 	<property name="LocalSettingsFile" value="${environment::get-folder-path('LocalApplicationData')}\.nant\local-settings.include"/>
@@ -170,6 +170,69 @@ TODO:
 
 	<target name="optimise-images">
 
+		<!-- Create temporary images directory if it doesn't exist -->
+		<property name="imagesTempPath" value="dist/tmp/images-opt/"/>
+		<mkdir dir="${imagesTempPath}"/>
+
+		<!-- Copy images from dist images path to temporary directory if newer -->
+		<foreach item="File" property="filename">
+
+			<in>
+				<items basedir="${imagesDistPath}">
+					<include name="**/*.png" />
+					<include name="**/*.jpg" />
+					<include name="**/*.gif" />
+					<include name="**/*.ico" />
+				</items>
+			</in>
+
+			<do>
+
+				<property name="image.path" value="${path::get-directory-name(filename)}\"/>
+				<property name="image.filename" value="${path::get-file-name(filename)}"/>
+				<property name="targetImage.path" value="${string::replace(image.path, string::replace(imagesDistPath, '/', '\'), string::replace(imagesTempPath, '/', '\'))}\"/>
+
+				<uptodate property="image.uptodate">
+					<sourcefiles>
+						<include name="${filename}" />
+					</sourcefiles>
+					<targetfiles>
+						<include name="${targetImage.path}/${image.filename}" />
+					</targetfiles>
+				</uptodate>
+
+				<if test="${not image.uptodate}">
+					<copy file="${filename}" tofile="${targetImage.path}/${image.filename}"/>
+				</if>
+
+			</do>
+		</foreach>
+
+		<!-- Remove any images from tmp that don't exist in dist (in case they've been removed/renamed) -->
+		<foreach item="File" property="filename">
+
+			<in>
+				<items basedir="${imagesTempPath}">
+					<include name="**/*.png" />
+					<include name="**/*.jpg" />
+					<include name="**/*.gif" />
+					<include name="**/*.ico" />
+				</items>
+			</in>
+
+			<do>
+
+				<property name="image.path" value="${path::get-directory-name(filename)}\"/>
+				<property name="image.filename" value="${path::get-file-name(filename)}"/>
+				<property name="targetImage.path" value="${string::replace(image.path, string::replace(imagesTempPath, '/', '\'), string::replace(imagesDistPath, '/', '\'))}\"/>
+
+				<if test="${not file::exists(targetImage.path + '/' + image.filename)}">
+					<delete file="${image.path}/${image.filename}"/>
+				</if>
+
+			</do>
+		</foreach>
+
 		<!-- PNG -->
 		<property name="dependency-name" value="PNG Crush"/>
 		<property name="dependency-path-property" value="PNGCrushPath"/>
@@ -177,15 +240,15 @@ TODO:
 
 		<foreach item="File" property="filename">
 			<in>
-				<items basedir="${imagesDistPath}">
+				<items basedir="${imagesTempPath}">
 					<include name="**/*.png" />
 				</items>
 			</in>
 			<do>
-				<!--<exec basedir="." program="${PNGCrushPath}" commandline=" -d ${imagesDistPath}opt -brute &quot;${filename}&quot;" failonerror="false" />-->
 				<exec basedir="." program="${PNGCrushPath}" commandline="-q  -brute -e -optimised.png &quot;${filename}&quot; &quot;${filename}&quot;" failonerror="false" />
 			</do>
 		</foreach>
+
 
 		<!-- JPEG -->
 		<property name="dependency-name" value="JPEG Tran"/>
@@ -194,7 +257,7 @@ TODO:
 
 		<foreach item="File" property="filename">
 			<in>
-				<items basedir="${imagesDistPath}">
+				<items basedir="${imagesTempPath}">
 					<include name="**/*.jp*g" />
 				</items>
 			</in>
@@ -210,7 +273,7 @@ TODO:
 
 		<foreach item="File" property="filename">
 			<in>
-				<items basedir="${imagesDistPath}">
+				<items basedir="${imagesTempPath}">
 					<include name="**/*.gif" />
 				</items>
 			</in>
@@ -222,12 +285,35 @@ TODO:
 		<!-- Replace images with their optimised versions -->
 		<foreach item="File" property="filename">
 			<in>
-				<items basedir="${imagesDistPath}">
+				<items basedir="${imagesTempPath}">
 					<include name="**/*-optimised.png" />
 				</items>
 			</in>
 			<do>
 				<move file="${filename}" tofile="${string::replace(filename, '-optimised.png', '.png')}"/>
+			</do>
+		</foreach>
+
+		<!-- TODO: Copy everything back to dist images dir -->
+		<foreach item="File" property="filename">
+
+			<in>
+				<items basedir="${imagesTempPath}">
+					<include name="**/*.png" />
+					<include name="**/*.jpg" />
+					<include name="**/*.gif" />
+					<include name="**/*.ico" />
+				</items>
+			</in>
+
+			<do>
+
+				<property name="image.path" value="${path::get-directory-name(filename)}\"/>
+				<property name="image.filename" value="${path::get-file-name(filename)}"/>
+				<property name="targetImage.path" value="${string::replace(image.path, string::replace(imagesTempPath, '/', '\'), string::replace(imagesDistPath, '/', '\'))}\"/>
+
+				<copy file="${filename}" tofile="${targetImage.path}/${image.filename}"/>
+
 			</do>
 		</foreach>
 
