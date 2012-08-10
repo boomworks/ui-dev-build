@@ -1,5 +1,5 @@
 #!/bin/bash
 
 dir=`${dirname "$BASH_SOURCE"}`
-nant -buildfile:"${dir}templates.build"
+nant -buildfile:"${dir}templates.build" $1
 

@@ -6,6 +6,8 @@ TODO:
 -->
 <project>
 
+	<property name="BuildScriptVersion" value="1.0.0"/>
+
 	<!-- Include machine specific properties -->
 	<property name="LocalSettingsFile" value="${environment::get-folder-path('LocalApplicationData')}\.nant\local-settings.include"/>
 
@@ -249,5 +251,44 @@ TODO:
 		<echo>Watching SCSS files in ${SCSSPath}...</echo>
 		<exec basedir="." program="${SASSPath}" commandline=" -g --watch ${SCSSPath}:${CSSPath}" failonerror="true" verbose="true" />
 	</target>
+
+
+	<target name="update">
+		<echo>Updating ui-dev-build scripts...</echo>
+		<echo>Current version: ${BuildScriptVersion}</echo>
+
+		<!-- TODO: output if stuff has been updated & which version -->
+
+		<!-- TODO: this doesn't work if the repo is private
+		<get src="https://github.com/lindsayevans/ui-dev-build/zipball/master" dest="ui-dev-build.zip" usetimestamp="true" failonerror="true"/> -->
+		<!-- TODO: notify user if get error? How about if up to date? How do we know? -->
+
+		<if test="${not file::exists(ScriptsPath + '/ui-dev-build.zip')}">
+			<fail message="Couldn't download the latest package from GitHub for some reason. Try again later"/>
+		</if>
+
+		<if test="${file::exists(ScriptsPath + '/ui-dev-build.zip')}">
+
+			<unzip zipfile="${ScriptsPath}/ui-dev-build.zip"/>
+
+			<!-- TODO: remove '-test' when it's all working properly & update functionality has been added to teh repo -->
+			<!-- Otherwise we'll update the build script with an unupdatable copy of itself ;) -->
+			<move todir="${ScriptsPath}-test" flatten="true" overwrite="true">
+				<fileset>
+					<include name="lindsayevans-ui-dev-build-*/scripts/*" />
+				</fileset>
+			</move>
+
+			<delete verbose="true">
+				<fileset>
+					<include name="lindsayevans-ui-dev-build-**" />
+					<include name="${ScriptsPath}/ui-dev-build.zip" />
+				</fileset>
+			</delete>
+
+		</if>
+
+	</target>
+
 
 </project>
