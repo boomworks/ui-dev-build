@@ -9,7 +9,7 @@ TODO:
 	<property name="BuildScriptVersion" value="1.0.1"/>
 
 	<!-- Include machine specific properties -->
-	<property name="LocalSettingsFile" value="${environment::get-folder-path('LocalApplicationData')}\.nant\local-settings.include"/>
+	<property name="LocalSettingsFile" value="${path::get-full-path(environment::get-folder-path('LocalApplicationData') + '/.nant/local-settings.include')}"/>
 
 	<if test="${not file::exists(LocalSettingsFile)}">
 		<fail message="You need a local settings file in ${LocalSettingsFile}"/>
