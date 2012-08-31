@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="Skeletor" default="generate-skeleton">
+<project name="Skeletor" default="skeletor">
 
 	<description>Generate a project skeleton</description>
 
@@ -8,19 +8,61 @@
 	<property name="project-js-filename" value="my-superawesome-project"/>
 	<property name="project-js-modulename" value="MySuperAwesomeProject"/>
 
+	<property name="project-type" value="html5"/>
+
 	<property name="fromdir" value="skeleton"/>
 	<property name="todir" value="skeleton-tmp"/>
 
-	<!-- TODO: grab latest skeleton templates from GitHub repo -->
 
-	<target name="generate-skeleton">
+	<property name="ScriptsPath" value="${path::get-directory-name(project::get-buildfile-path())}"/>
+
+
+	<target name="skeletor">
+		<call target="retrieve-skeleton"/>
+		<call target="generate-templates"/>
+	</target>
+
+	
+	<target name="retrieve-skeleton">
+
+		<!-- TODO: grab latest skeleton templates from GitHub repo -->
+
+		<get src="https://github.com/boomworks/ui-dev-skeleton/zipball/master" dest="${ScriptsPath}/ui-dev-skeleton.zip" usetimestamp="true" failonerror="true"/>
+
+		<!-- TODO: notify user if get error? How about if up to date? How do we know? -->
+		<if test="${not file::exists(ScriptsPath + '/ui-dev-skeleton.zip')}">
+			<fail message="Couldn't download the latest package from GitHub for some reason. Try again later"/>
+		</if>
+
+		<if test="${file::exists(ScriptsPath + '/ui-dev-skeleton.zip')}">
+
+			<unzip zipfile="${ScriptsPath}/ui-dev-skeleton.zip"/>
+
+			<move todir="${ScriptsPath}" flatten="true" overwrite="true">
+				<fileset>
+					<include name="boomworks-ui-dev-skeleton-*/scripts/*" />
+				</fileset>
+			</move>
+
+			<delete verbose="true">
+				<fileset>
+					<!--<include name="${ScriptsPath}/boomworks-ui-dev-skeleton-**" />-->
+					<include name="${ScriptsPath}/ui-dev-skeleton.zip" />
+				</fileset>
+			</delete>
+
+		</if>
+
+	</target>
+
+	<target name="generate-templates">
 
 		<!-- TODO: loop over files & replace tokens in file names -->
 		<!-- TODO: different repos for different project types? (i.e. proto, plain HTML, for Ektron, Require.js, Sass, etc.) -->
 
 		<copy todir="${todir}">
-			<fileset basedir="${fromdir}">
-				<include name="**/*" />
+			<fileset>
+				<include name="${ScriptsPath}/boomworks-ui-dev-skeleton-**" />
 			</fileset>
 			<filterchain>
 				<replacetokens>
