@@ -3,20 +3,14 @@
 
 	<description>Generate a project skeleton</description>
 
-	<!-- TODO: pull these in from command line properties -->
-	<property name="project-name" value="My SuperAwesome Project"/>
-	<property name="project-directory" value="my-superawesome-project"/>
-	<property name="project-js-filename" value="my-superawesome-project"/>
-	<property name="project-js-modulename" value="MySuperAwesomeProject"/>
+	<property name="project-fullname" value="My SuperAwesome Project"/>
+	<property name="project-directory" value="${string::trim(string::to-lower(string::replace(project-fullname, ' ', '-')))}"/>
+	<property name="project-js-filename" value="${string::trim(string::to-lower(string::replace(project-fullname, ' ', '-')))}"/>
+	<property name="project-js-modulename" value="${string::trim(string::replace(project-fullname, ' ', ''))}"/>
 
 	<property name="project-type" value="html5"/>
 
-	<property name="fromdir" value="skeleton"/>
-	<property name="todir" value="skeleton-tmp"/>
-
-
 	<property name="ScriptsPath" value="${path::get-directory-name(project::get-buildfile-path())}"/>
-
 
 	<target name="skeletor">
 		<call target="retrieve-skeleton"/>
@@ -48,7 +42,7 @@
 
 					<property name="file.path" value="${path::get-directory-name(filename)}\"/>
 					<property name="file.filename" value="${path::get-file-name(filename)}"/>
-					<property name="file.toFilename" value="${string::replace(file.filename, '@PROJECT-NAME@', project-name)}"/>
+					<property name="file.toFilename" value="${string::replace(file.filename, '@PROJECT-NAME@', project-fullname)}"/>
 					<property name="file.toFilename" value="${string::replace(file.toFilename, '@PROJECT-JS-FILENAME@', project-js-filename)}"/>
 					<property name="file.toFilename" value="${string::replace(file.toFilename, '@PROJECT-JS-MODULENAME@', project-js-modulename)}"/>
 
@@ -65,7 +59,7 @@
 					<move file="${filename}" tofile="${target.path}${file.toFilename}">
 						<filterchain>
 							<replacetokens>
-								<token key="PROJECT-NAME" value="${project-name}" />
+								<token key="PROJECT-NAME" value="${project-fullname}" />
 								<token key="PROJECT-JS-FILENAME" value="${project-js-filename}" />
 								<token key="PROJECT-JS-MODULENAME" value="${project-js-modulename}" />
 							</replacetokens>
