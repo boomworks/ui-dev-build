@@ -19,35 +19,67 @@
 
 	<target name="skeletor">
 		<call target="retrieve-skeleton"/>
-		<call target="generate-templates"/>
+		<!--<call target="generate-templates"/>-->
 	</target>
 
 	
 	<target name="retrieve-skeleton">
 
 		<!-- TODO: grab latest skeleton templates from GitHub repo -->
+		<!-- TODO: different repos for different project types? (i.e. proto, plain HTML, for Ektron, Require.js, Sass, etc.) -->
 
-		<get src="https://github.com/boomworks/ui-dev-skeleton/zipball/master" dest="${ScriptsPath}/ui-dev-skeleton.zip" usetimestamp="true" failonerror="true"/>
+		<!--<get src="https://github.com/boomworks/ui-dev-skeleton/zipball/master" dest="${ScriptsPath}/ui-dev-skeleton.zip" usetimestamp="true" failonerror="true"/>-->
 
 		<!-- TODO: notify user if get error? How about if up to date? How do we know? -->
-		<if test="${not file::exists(ScriptsPath + '/ui-dev-skeleton.zip')}">
+		<!--<if test="${not file::exists(ScriptsPath + '/ui-dev-skeleton.zip')}">
 			<fail message="Couldn't download the latest package from GitHub for some reason. Try again later"/>
-		</if>
+		</if>-->
 
 		<if test="${file::exists(ScriptsPath + '/ui-dev-skeleton.zip')}">
 
 			<unzip zipfile="${ScriptsPath}/ui-dev-skeleton.zip"/>
 
+			<foreach item="File" property="filename">
+
+				<in>
+					<items basedir="./">
+						<include name="boomworks-ui-dev-skeleton-*/${project-type}/**/*" />
+					</items>
+				</in>
+
+				<do>
+
+					<property name="file.path" value="${path::get-directory-name(filename)}\"/>
+					<property name="file.filename" value="${path::get-file-name(filename)}"/>
+					<property name="file.toFilename" value="${string::replace(file.filename, '@PROJECT-NAME@', project-name)}"/>
+					<property name="file.toFilename" value="${string::replace(file.toFilename, '@PROJECT-JS-FILENAME@', project-js-filename)}"/>
+					<property name="file.toFilename" value="${string::replace(file.toFilename, '@PROJECT-MODULE-NAME@', project-js-modulename)}"/>
+
+					<property name="zipball.path" value="${string::substring(file.path, string::get-length(ScriptsPath), 34)}"/>
+					<property name="target.path" value="${string::replace(file.path, zipball.path, '')}"/>
+
+
+					<echo>Copy to: ${target.path}${file.toFilename}</echo>
+
+<!--
+					<if test="${not file::exists(targetImage.path + '/' + image.filename)}">
+						<delete file="${image.path}/${image.filename}"/>
+					</if>
+-->
+				</do>
+			</foreach>
+
+<!--
 			<move todir="${ScriptsPath}" flatten="true" overwrite="true">
 				<fileset>
 					<include name="boomworks-ui-dev-skeleton-*/scripts/*" />
 				</fileset>
 			</move>
-
+-->
 			<delete verbose="true">
 				<fileset>
 					<!--<include name="${ScriptsPath}/boomworks-ui-dev-skeleton-**" />-->
-					<include name="${ScriptsPath}/ui-dev-skeleton.zip" />
+					<!--<include name="${ScriptsPath}/ui-dev-skeleton.zip" />-->
 				</fileset>
 			</delete>
 
@@ -58,7 +90,6 @@
 	<target name="generate-templates">
 
 		<!-- TODO: loop over files & replace tokens in file names -->
-		<!-- TODO: different repos for different project types? (i.e. proto, plain HTML, for Ektron, Require.js, Sass, etc.) -->
 
 		<copy todir="${todir}">
 			<fileset>
